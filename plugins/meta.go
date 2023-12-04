@@ -9,8 +9,9 @@ import (
 
 	"github.com/graph-gophers/graphql-go"
 	"github.com/graph-gophers/graphql-go/relay"
-	"github.com/movio/bramble"
 	"github.com/vektah/gqlparser/v2/ast"
+
+	"github.com/karatekaneen/bramble"
 )
 
 func init() {
@@ -204,11 +205,17 @@ func strToPtr(s string) *string {
 	return &s
 }
 
-func (r *metaPluginResolver) GetService(ctx context.Context, args struct{ ID graphql.ID }) *brambleService {
+func (r *metaPluginResolver) GetService(
+	ctx context.Context,
+	args struct{ ID graphql.ID },
+) *brambleService {
 	return r.metaResolver.GetService(ctx, args)
 }
 
-func (r *metaResolver) GetService(ctx context.Context, args struct{ ID graphql.ID }) *brambleService {
+func (r *metaResolver) GetService(
+	ctx context.Context,
+	args struct{ ID graphql.ID },
+) *brambleService {
 	for _, service := range r.Services() {
 		if service.Name == string(args.ID) {
 			return &service
@@ -218,11 +225,17 @@ func (r *metaResolver) GetService(ctx context.Context, args struct{ ID graphql.I
 	return nil
 }
 
-func (r *metaPluginResolver) GetType(ctx context.Context, args struct{ ID graphql.ID }) (*brambleType, error) {
+func (r *metaPluginResolver) GetType(
+	ctx context.Context,
+	args struct{ ID graphql.ID },
+) (*brambleType, error) {
 	return r.metaResolver.GetType(ctx, args)
 }
 
-func (r *metaResolver) GetType(ctx context.Context, args struct{ ID graphql.ID }) (*brambleType, error) {
+func (r *metaResolver) GetType(
+	ctx context.Context,
+	args struct{ ID graphql.ID },
+) (*brambleType, error) {
 	typeName := string(args.ID)
 	for _, t := range r.getTypes(r.executableSchema.MergedSchema) {
 		if t.Name == typeName {
@@ -294,15 +307,24 @@ func (r *metaResolver) brambleType(name string, def *ast.Definition) brambleType
 	}
 }
 
-func (r *metaResolver) Field(ctx context.Context, args struct{ ID graphql.ID }) (*brambleField, error) {
+func (r *metaResolver) Field(
+	ctx context.Context,
+	args struct{ ID graphql.ID },
+) (*brambleField, error) {
 	return r.GetField(ctx, args)
 }
 
-func (r *metaResolver) Type(ctx context.Context, args struct{ ID graphql.ID }) (*brambleType, error) {
+func (r *metaResolver) Type(
+	ctx context.Context,
+	args struct{ ID graphql.ID },
+) (*brambleType, error) {
 	return r.GetType(ctx, args)
 }
 
-func (r *metaResolver) Service(ctx context.Context, args struct{ ID graphql.ID }) (*brambleService, error) {
+func (r *metaResolver) Service(
+	ctx context.Context,
+	args struct{ ID graphql.ID },
+) (*brambleService, error) {
 	return r.GetService(ctx, args), nil
 }
 
@@ -310,11 +332,17 @@ type metaResolver struct {
 	executableSchema *bramble.ExecutableSchema
 }
 
-func (r *metaPluginResolver) GetField(ctx context.Context, args struct{ ID graphql.ID }) (*brambleField, error) {
+func (r *metaPluginResolver) GetField(
+	ctx context.Context,
+	args struct{ ID graphql.ID },
+) (*brambleField, error) {
 	return r.metaResolver.GetField(ctx, args)
 }
 
-func (r *metaResolver) GetField(ctx context.Context, args struct{ ID graphql.ID }) (*brambleField, error) {
+func (r *metaResolver) GetField(
+	ctx context.Context,
+	args struct{ ID graphql.ID },
+) (*brambleField, error) {
 	for _, f := range r.getFields(r.executableSchema.MergedSchema) {
 		if f.ID == args.ID {
 			return &f, nil

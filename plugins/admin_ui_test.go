@@ -6,10 +6,11 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/movio/bramble"
 	"github.com/stretchr/testify/assert"
 	"github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
+
+	"github.com/karatekaneen/bramble"
 )
 
 func TestAdminUI(t *testing.T) {

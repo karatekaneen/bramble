@@ -5,8 +5,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/movio/bramble"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/karatekaneen/bramble"
 )
 
 func TestHeaders(t *testing.T) {
@@ -16,11 +17,13 @@ func TestHeaders(t *testing.T) {
 
 	t.Run("unknown header is not in context", func(t *testing.T) {
 		called := false
-		handler := p.ApplyMiddlewarePublicMux(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			called = true
-			headers := bramble.GetOutgoingRequestHeadersFromContext(r.Context())
-			assert.Empty(t, headers.Get("X-Bad-Header"))
-		}))
+		handler := p.ApplyMiddlewarePublicMux(
+			http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				called = true
+				headers := bramble.GetOutgoingRequestHeadersFromContext(r.Context())
+				assert.Empty(t, headers.Get("X-Bad-Header"))
+			}),
+		)
 		req := httptest.NewRequest(http.MethodPost, "/query", nil)
 		req.Header.Add("X-Bad-Header", "bad")
 		handler.ServeHTTP(httptest.NewRecorder(), req)
@@ -28,11 +31,13 @@ func TestHeaders(t *testing.T) {
 	})
 	t.Run("allowed header is in context", func(t *testing.T) {
 		called := false
-		handler := p.ApplyMiddlewarePublicMux(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			called = true
-			headers := bramble.GetOutgoingRequestHeadersFromContext(r.Context())
-			assert.Equal(t, headers.Get("X-Fun-Header"), "funtime")
-		}))
+		handler := p.ApplyMiddlewarePublicMux(
+			http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				called = true
+				headers := bramble.GetOutgoingRequestHeadersFromContext(r.Context())
+				assert.Equal(t, headers.Get("X-Fun-Header"), "funtime")
+			}),
+		)
 		req := httptest.NewRequest(http.MethodPost, "/query", nil)
 		req.Header.Add("X-Fun-Header", "funtime")
 		handler.ServeHTTP(httptest.NewRecorder(), req)

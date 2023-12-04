@@ -12,7 +12,7 @@ import (
 	"github.com/vektah/gqlparser/v2/ast"
 	"github.com/vektah/gqlparser/v2/formatter"
 
-	"github.com/movio/bramble"
+	"github.com/karatekaneen/bramble"
 )
 
 func init() {

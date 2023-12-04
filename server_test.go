@@ -3,7 +3,7 @@ package bramble
 import (
 	"testing"
 
-	"github.com/movio/bramble/testsrv"
+	"github.com/karatekaneen/bramble/testsrv"
 	"github.com/stretchr/testify/require"
 	"github.com/vektah/gqlparser/v2"
 )
@@ -12,7 +12,13 @@ func TestFederatedQuery(t *testing.T) {
 	gizmoService := testsrv.NewGizmoService()
 	gadgetService := testsrv.NewGadgetService()
 
-	executableSchema := NewExecutableSchema(nil, 10, nil, NewService(gizmoService.URL), NewService(gadgetService.URL))
+	executableSchema := NewExecutableSchema(
+		nil,
+		10,
+		nil,
+		NewService(gizmoService.URL),
+		NewService(gadgetService.URL),
+	)
 
 	require.NoError(t, executableSchema.UpdateSchema(true))
 
@@ -43,7 +49,13 @@ func TestFederatedQueryWithMultipleFragmentSpreads(t *testing.T) {
 	gizmoService := testsrv.NewGizmoService()
 	gadgetService := testsrv.NewGadgetService()
 
-	executableSchema := NewExecutableSchema(nil, 10, nil, NewService(gizmoService.URL), NewService(gadgetService.URL))
+	executableSchema := NewExecutableSchema(
+		nil,
+		10,
+		nil,
+		NewService(gizmoService.URL),
+		NewService(gadgetService.URL),
+	)
 
 	require.NoError(t, executableSchema.UpdateSchema(true))
 

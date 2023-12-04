@@ -10,16 +10,20 @@ import (
 
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/golang-jwt/jwt/v4/request"
-	"github.com/movio/bramble"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/square/go-jose.v2"
+
+	"github.com/karatekaneen/bramble"
 )
 
 func init() {
 	bramble.RegisterPlugin(NewJWTPlugin(nil, nil))
 }
 
-func NewJWTPlugin(keyProviders []SigningKeyProvider, roles map[string]bramble.OperationPermissions) *JWTPlugin {
+func NewJWTPlugin(
+	keyProviders []SigningKeyProvider,
+	roles map[string]bramble.OperationPermissions,
+) *JWTPlugin {
 	publicKeys := make(map[string]*rsa.PublicKey)
 	for _, p := range keyProviders {
 		keys, err := p.Keys()
@@ -114,24 +118,30 @@ func (p *JWTPlugin) ApplyMiddlewarePublicMux(h http.Handler) http.Handler {
 		if err != nil {
 			// unauthenticated request, must use "public_role"
 			log.Info("unauthenticated request")
-			r = r.WithContext(bramble.AddPermissionsToContext(r.Context(), p.config.Roles["public_role"]))
+			r = r.WithContext(
+				bramble.AddPermissionsToContext(r.Context(), p.config.Roles["public_role"]),
+			)
 			h.ServeHTTP(rw, r)
 			return
 		}
 
 		var claims Claims
-		_, err = jwt.ParseWithClaims(tokenStr, &claims, func(token *jwt.Token) (interface{}, error) {
-			if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
-				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-			}
+		_, err = jwt.ParseWithClaims(
+			tokenStr,
+			&claims,
+			func(token *jwt.Token) (interface{}, error) {
+				if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
+					return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+				}
 
-			keyID, _ := token.Header["kid"].(string)
-			if key, ok := p.publicKeys[keyID]; ok {
-				return key, nil
-			}
+				keyID, _ := token.Header["kid"].(string)
+				if key, ok := p.publicKeys[keyID]; ok {
+					return key, nil
+				}
 
-			return nil, fmt.Errorf("could not find key for kid %q", keyID)
-		})
+				return nil, fmt.Errorf("could not find key for kid %q", keyID)
+			},
+		)
 		if err != nil {
 			log.WithError(err).Info("invalid token")
 			rw.WriteHeader(http.StatusUnauthorized)
@@ -160,7 +170,10 @@ func (p *JWTPlugin) ApplyMiddlewarePublicMux(h http.Handler) http.Handler {
 	})
 }
 
-func addStandardJWTClaimsToOutgoingRequest(ctx context.Context, claims jwt.StandardClaims) context.Context {
+func addStandardJWTClaimsToOutgoingRequest(
+	ctx context.Context,
+	claims jwt.StandardClaims,
+) context.Context {
 	if claims.Audience != "" {
 		ctx = bramble.AddOutgoingRequestsHeaderToContext(ctx, "JWT-Claim-Audience", claims.Audience)
 	}

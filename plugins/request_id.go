@@ -4,7 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gofrs/uuid"
-	"github.com/movio/bramble"
+
+	"github.com/karatekaneen/bramble"
 )
 
 const BrambleRequestHeader = "X-Request-Id"

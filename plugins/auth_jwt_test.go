@@ -10,10 +10,11 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/movio/bramble"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gopkg.in/square/go-jose.v2"
+
+	"github.com/karatekaneen/bramble"
 )
 
 const testPrivateKey = `-----BEGIN RSA PRIVATE KEY-----
@@ -159,15 +160,17 @@ func TestJWTPlugin(t *testing.T) {
 		privateKey, err := jwt.ParseRSAPrivateKeyFromPEM([]byte(testPrivateKey))
 		require.NoError(t, err)
 
-		jwksHandler := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			var jwks jose.JSONWebKeySet
-			jwks.Keys = append(jwks.Keys, jose.JSONWebKey{
-				Key:       &privateKey.PublicKey,
-				KeyID:     "test-key-id",
-				Algorithm: string(jose.RS256),
-			})
-			_ = json.NewEncoder(w).Encode(jwks)
-		}))
+		jwksHandler := httptest.NewServer(
+			http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				var jwks jose.JSONWebKeySet
+				jwks.Keys = append(jwks.Keys, jose.JSONWebKey{
+					Key:       &privateKey.PublicKey,
+					KeyID:     "test-key-id",
+					Algorithm: string(jose.RS256),
+				})
+				_ = json.NewEncoder(w).Encode(jwks)
+			}),
+		)
 
 		jwtPlugin := NewJWTPlugin(nil, nil)
 		err = jwtPlugin.Configure(&bramble.Config{}, json.RawMessage(fmt.Sprintf(`{
