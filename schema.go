@@ -6,14 +6,10 @@ import (
 	"github.com/vektah/gqlparser/v2/ast"
 )
 
-var (
-	IdFieldName  = "id"
-	IdsFieldName = "ids"
-)
+var IdFieldName = "id"
 
 const (
 	nodeRootFieldName      = "node"
-	nodesRootFieldName     = "nodes"
 	nodeInterfaceName      = "Node"
 	serviceObjectName      = "Service"
 	serviceRootFieldName   = "service"
@@ -33,10 +29,6 @@ func isGraphQLBuiltinName(s string) bool {
 
 func isIDType(t *ast.Type) bool {
 	return isNonNullableTypeNamed(t, "ID")
-}
-
-func isIDsType(t *ast.Type) bool {
-	return t.Elem != nil && isNonNullableTypeNamed(t, "ID") && isNonNullableTypeNamed(t.Elem, "ID")
 }
 
 func isNonNullableTypeNamed(t *ast.Type, typename string) bool {
